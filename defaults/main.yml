@@ -1,0 +1,14 @@
+---
+# defaults file for ansible-docker_dropbox
+
+# name used for the docker container
+docker_dropbox_dockername: "dropbox"
+# folder where dropbox conf is stored (incl the auth token)
+docker_dropbox_config_dir: "/mnt/dropbox_conf"
+# folder where dropbox data will be synced
+docker_dropbox_data_dir: "/mnt/dropbox_data"
+# user and group (and id) used as owner of the conf and data folders
+docker_dropbox_user: "myuser"
+docker_dropbox_userid: 1001
+docker_dropbox_group: "users"
+docker_dropbox_groupid: 100

@@ -1,0 +1,42 @@
+---
+# tasks file for ansible-docker_dropbox
+
+
+- name: thomfab/docker_dropbox | check if previous instance exists
+  sudo: yes
+  shell: docker ps -a | grep {{ docker_dropbox_dockername }} | wc -l
+  register: instances_running
+  ignore_errors: True
+
+- name: thomfab/docker_dropbox | check if image exists
+  sudo: yes
+  shell: docker images | grep thomfab/docker-dropbox | wc -l
+  register: image_pulled
+  ignore_errors: True
+
+- name: thomfab/docker_dropbox | pull thomfab/docker-dropbox image
+  sudo: yes
+  command: docker pull thomfab/docker-dropbox
+  when: image_pulled.stdout == "0"
+
+- name: thomfab/docker_dropbox | make sure config dir exists
+  sudo: yes
+  file: path={{ docker_dropbox_config_dir }} owner={{ docker_dropbox_user }} group={{ docker_dropbox_group }} mode=0775 state=directory
+
+- name: thomfab/docker_dropbox | make sure dropbox data dir exists
+  sudo: yes
+  file: path={{ docker_dropbox_data_dir }} owner={{ docker_dropbox_user }} group={{ docker_dropbox_group }} mode=0775 state=directory
+
+- name: thomfab/docker_dropbox | start instance
+  sudo: yes
+  command: docker run -d --name="{{ docker_dropbox_dockername }}" \
+          -v /etc/localtime:/etc/localtime:ro \
+          -v /etc/timezone:/etc/timezone:ro \
+          -v {{ docker_dropbox_data_dir }}:/dropbox/Dropbox \
+          -v {{ docker_dropbox_config_dir }}:/dropbox/.dropbox \
+          -e DROPBOX_USER="{{ docker_dropbox_user }}" \
+          -e DROPBOX_USERID={{ docker_dropbox_userid }} \
+          -e DROPBOX_GROUP="{{ docker_dropbox_group }}" \
+          -e DROPBOX_GROUPID={{ docker_dropbox_groupid }} \
+          thomfab/docker-dropbox
+  when: instances_running.stdout == "0"
