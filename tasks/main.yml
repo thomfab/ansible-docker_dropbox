@@ -30,6 +30,7 @@
 - name: thomfab/docker_dropbox | start instance
   sudo: yes
   command: docker run -d --name="{{ docker_dropbox_dockername }}" \
+          --privileged=true \
           -v /etc/localtime:/etc/localtime:ro \
           -v /etc/timezone:/etc/timezone:ro \
           -v {{ docker_dropbox_data_dir }}:/dropbox/Dropbox \
